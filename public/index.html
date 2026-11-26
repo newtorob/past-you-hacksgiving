@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e9f2f4">
+  <title>Past You | A little help from your history</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Past You home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9H3V6M3.5 9a8 8 0 1 1 1.2 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>past you<span class="brand-period">.</span></span>
+      </a>
+      <div class="top-note">A little help from your history</div>
+      <div class="environment" id="environment" aria-live="polite"><span class="status-dot"></span><span>Checking setup</span></div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="headline">
+        <div class="intro-copy">
+          <h1 id="headline">Before you change it,<br><em>remember why.</em></h1>
+          <p class="intro-body">Somewhere in your code history, past you left a clue. Let’s find it before it becomes tomorrow’s bug.</p>
+        </div>
+        <div class="intro-doodle" aria-hidden="true"><span>you, then</span><svg viewBox="0 0 52 28" fill="none"><path d="M2 22C16 3 27 4 46 13M41 6l7 8-10 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>you, now</span></div>
+      </section>
+
+      <div class="desk">
+        <section class="proposal-panel panel" aria-labelledby="proposal-title">
+          <h2 id="proposal-title">What are you thinking?</h2>
+          <p class="section-copy">Describe a change. Past You will look for an earlier decision worth revisiting.</p>
+          <form id="investigation-form" novalidate>
+            <label for="proposal">Your proposed change</label>
+            <textarea id="proposal" name="proposal" rows="5" maxlength="2000" aria-describedby="proposal-help proposal-error"></textarea>
+            <div class="field-bottom"><span id="proposal-help">A specific idea works best.</span><span id="count">0 / 2,000</span></div>
+            <p id="proposal-error" class="field-error" role="alert" hidden></p>
+            <button id="investigate" type="submit"><span class="button-label">Ask Past You</span><svg class="button-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 7l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </form>
+          <div class="case-info">
+            <span class="case-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M6 7h12M6 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></span>
+            <div><strong>Today’s case</strong><span id="repo-label">newtorob/potluck-ai</span></div>
+          </div>
+          <p class="privacy-note" id="mode-explanation">Checking which sources are available.</p>
+        </section>
+
+        <div class="connection-line" aria-hidden="true"><span>follow<br>the thread</span><svg viewBox="0 0 42 24" fill="none"><path d="M2 12h34M30 6l6 6-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <section class="result-panel" aria-labelledby="result-title" aria-live="polite" aria-busy="false">
+          <div class="result-heading"><div><span id="result-title">The handoff</span></div><span class="result-time">A note to future you</span></div>
+          <div id="result-content" class="result-content">
+            <div class="empty-note">
+              <svg class="paperclip" aria-hidden="true" viewBox="0 0 32 48" fill="none"><path d="M11 29V12a7 7 0 0 1 14 0v22a10 10 0 0 1-20 0V14m6 15a4 4 0 0 0 8 0V13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <p class="note-salutation">Hey, future you.</p>
+              <p>Your note will land here with the decision, the source, and any test we can actually run.</p>
+              <span class="note-signoff">Love, past you</span>
+            </div>
+            <div class="empty-explainer"><p>Good context has a way of showing up right when you need it.</p></div>
+          </div>
+          <p id="investigation-error" class="request-error" role="alert" hidden></p>
+        </section>
+      </div>
+    </main>
+    <footer><span>Made for the things you almost forgot.</span><span>PAST YOU · HACKSGIVING ’26</span></footer>
+  </div>
+</body>
+</html>
