@@ -7,3 +7,4 @@ coverage/
 .impeccable/
 premium-audit.json
 __pycache__/
+data/

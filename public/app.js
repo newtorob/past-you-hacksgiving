@@ -46,6 +46,7 @@ async function loadConfig() {
       : config.modelMode === 'model'
         ? 'Search terms go to GitHub. Your proposed change and relevant commit text go to the configured model.'
         : 'Search terms go to GitHub. This uses simple keyword matching; no model is connected.';
+    if (config.dailyLimit) modeExplanation.textContent += ` Public demo: up to ${config.dailyLimit} investigations daily, resetting at 00:00 UTC.`;
   } catch (error) {
     environment.textContent = 'Setup unavailable';
     modeExplanation.textContent = 'The app could not check its setup. Reload the page and try again.';

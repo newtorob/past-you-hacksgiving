@@ -28,14 +28,14 @@ export function createModel({ url, name, fetchImpl = fetch } = {}) {
   }
   return {
     name,
-    async chat(messages) {
+    async chat(messages, { timeoutMs = 45000 } = {}) {
       let response;
       try {
         response = await fetchImpl(url, {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ model: name, messages, tools: TOOL_DEFINITIONS, temperature: 0, max_tokens: 1100 }),
           redirect: 'error',
-          signal: AbortSignal.timeout(45000),
+          signal: AbortSignal.timeout(Math.max(1, Math.min(45000, timeoutMs))),
         });
       } catch { throw new Error('The model connector could not be reached. Check its configuration and Sprite access.'); }
       if (response.status === 402) throw new Error('The model provider needs available usage credits. Check its billing and try again.');
@@ -54,7 +54,7 @@ function queryFor(proposal) {
   return proposal.slice(0, 160);
 }
 
-export async function investigate({ proposal, history = createHistory(), model = null, replay = runReplay } = {}) {
+export async function investigate({ proposal, history = createHistory(), model = null, replay = runReplay, timeoutMs = 110000 } = {}) {
   if (typeof proposal !== 'string' || proposal.trim().length < 12 || proposal.length > 2000) {
     throw new Error('Describe the proposed change in 12 to 2,000 characters.');
   }
@@ -63,8 +63,10 @@ export async function investigate({ proposal, history = createHistory(), model =
   let testResult = null;
   let toolCount = 0;
   const activity = [];
+  const deadline = Date.now() + timeoutMs;
 
   async function useTool(name, args = {}, automatic = false) {
+    if (Date.now() >= deadline) throw new Error('The investigation took too long. Please try again.');
     if (!automatic && ++toolCount > 8) throw new Error('The investigation reached its tool-call limit.');
     if (name === 'search_history') {
       const items = await history.search(args.query);
@@ -105,7 +107,9 @@ export async function investigate({ proposal, history = createHistory(), model =
   } else {
     const messages = [{ role: 'system', content: SYSTEM }, { role: 'user', content: proposal.trim() }];
     for (let round = 0; round < 9; round++) {
-      const message = await model.chat(messages);
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) throw new Error('The investigation took too long. Please try again.');
+      const message = await model.chat(messages, { timeoutMs: Math.min(45000, remaining) });
       messages.push(message);
       if (Array.isArray(message.tool_calls) && message.tool_calls.length) {
         if (message.tool_calls.length > 4) throw new Error('The model requested too many actions at once.');

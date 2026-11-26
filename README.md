@@ -4,7 +4,7 @@ An agent that looks for the decision behind a proposed code change and checks a 
 
 The first case uses public Potluck history: a tool-call retry once selected a machine with incompatible markers. Past You can retrieve the relevant commit from the public GitHub API or a Fly Sprites GitHub connector, use a tool-calling model to investigate it, and run the original test against both the historical code and a clearly labeled hypothetical regression.
 
-The [draft demo video](demo/past-you-demo.mp4) uses screenshots from a real Ollama-powered run, with system narration and selectable captions. It is assembled from stills, not a continuous screen recording.
+The [draft demo video](https://cdn.jsdelivr.net/gh/newtorob/past-you-hacksgiving@2b72b79/demo/past-you-demo.mp4) uses screenshots from a real Ollama-powered run, with system narration and selectable captions. It is assembled from stills, not a continuous screen recording. The [video file](demo/past-you-demo.mp4) is also in this repository.
 
 ## Run locally
 
@@ -45,7 +45,9 @@ The Hacksgiving submission must actually use at least one Sprites connector. The
 
 If only public GitHub access or the GitHub connector is configured, the app uses live history with explicitly labeled simple matching. If only a model is configured, it uses labeled sample history. Live history and a working model connector are needed for the intended agent demo; model availability and billing depend on the configured provider. Public GitHub API requests are subject to unauthenticated rate limits.
 
-The Sprite URL is private by default. This prototype has a single shared investigation slot and no public-user authentication or usage quota, so keep it private while connected to accounts or a metered model.
+The Sprite URL is private by default. Before making it public, set `PASTYOU_DAILY_LIMIT` to a positive number and `PASTYOU_QUOTA_FILE` to an absolute path on persistent Sprite storage. The example allows 30 accepted investigations per UTC day. A failed investigation still counts, and the allowance is reserved before model calls begin. The counter persists across service restarts and fails closed if its state cannot be read or saved. The app handles two investigations at once and queues up to four more briefly; further visitors are asked to retry.
+
+The cap limits investigations, not dollars, and does not guarantee fair access between visitors. Check your provider's billing settings separately. The counter coordinates one service process on one Sprite; multiple instances would need shared atomic quota and queue state. Public GitHub API rate limits and model-provider limits still apply.
 
 ## Boundaries
 

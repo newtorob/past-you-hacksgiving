@@ -20,7 +20,7 @@ The first demonstration uses a historical Potluck commit and its original tool-c
 
 ## Capabilities and Constraints
 
-The first version is scoped to one public repository and one approved regression test. It never runs a user-supplied shell command. It distinguishes the public GitHub API, a live GitHub connector, and saved sample excerpts, and distinguishes model output from simple matching. Provider credentials belong in Fly connectors, not in the Sprite. Running tests against arbitrary repositories and supporting private user data are undecided.
+The first version is scoped to one public repository and one approved regression test. It never runs a user-supplied shell command. It distinguishes the public GitHub API, a live GitHub connector, and saved sample excerpts, and distinguishes model output from simple matching. Provider credentials belong in Fly connectors, not in the Sprite. A bounded queue and a persistent daily investigation cap support a small public demo on one Sprite. Running tests against arbitrary repositories and supporting private user data are undecided.
 
 ## Evidence on Hand
 

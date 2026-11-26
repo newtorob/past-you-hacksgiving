@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createHistory } from './history.js';
 import { createModel, DEFAULT_PROPOSAL, investigate } from './agent.js';
+import { createRunGate } from './limits.js';
 
 const ASSETS = new Map([
   ['/', ['../public/index.html', 'text/html; charset=utf-8']],
@@ -24,13 +25,16 @@ async function bodyJSON(req) {
   try { return JSON.parse(body); } catch { throw new Error('Request must contain valid JSON.'); }
 }
 
-export function makeServer({ history, model, replay } = {}) {
+export function makeServer({ history, model, replay, gate } = {}) {
   const selectedHistory = history || createHistory({
     connectorBase: process.env.PASTYOU_GITHUB_CONNECTOR || '',
     publicAccess: process.env.PASTYOU_GITHUB_PUBLIC === '1',
   });
   const selectedModel = model === undefined ? createModel({ url: process.env.PASTYOU_MODEL_URL, name: process.env.PASTYOU_MODEL }) : model;
-  let running = false;
+  const runGate = gate || createRunGate({
+    dailyLimit: Number(process.env.PASTYOU_DAILY_LIMIT || 0),
+    quotaFile: process.env.PASTYOU_QUOTA_FILE || '',
+  });
   return createServer(async (req, res) => {
     res.setHeader('x-content-type-options', 'nosniff');
     res.setHeader('referrer-policy', 'no-referrer');
@@ -45,7 +49,7 @@ export function makeServer({ history, model, replay } = {}) {
       } catch { return json(res, 500, { error: 'The application could not load.' }); }
     }
     if (req.method === 'GET' && path === '/api/config') {
-      return json(res, 200, { repository: selectedHistory.repo, sourceMode: selectedHistory.mode, modelMode: selectedModel ? 'model' : 'heuristic', defaultProposal: DEFAULT_PROPOSAL });
+      return json(res, 200, { repository: selectedHistory.repo, sourceMode: selectedHistory.mode, modelMode: selectedModel ? 'model' : 'heuristic', defaultProposal: DEFAULT_PROPOSAL, dailyLimit: runGate.dailyLimit || null });
     }
     if (req.method === 'GET' && path === '/api/health') return json(res, 200, { ok: true });
     if (req.method === 'POST' && path === '/api/investigate') {
@@ -57,19 +61,27 @@ export function makeServer({ history, model, replay } = {}) {
         } catch { return json(res, 403, { error: 'Invalid request origin.' }); }
       }
       if (!String(req.headers['content-type'] || '').toLowerCase().startsWith('application/json')) return json(res, 415, { error: 'Use a JSON request.' });
-      if (running) return json(res, 409, { error: 'An investigation is already running. Wait for it to finish.' });
       let payload;
       try { payload = await bodyJSON(req); } catch (error) { return json(res, 400, { error: error.message }); }
       if (typeof payload?.proposal !== 'string' || payload.proposal.trim().length < 12 || payload.proposal.length > 2000) {
         return json(res, 400, { error: 'Describe the proposed change in 12 to 2,000 characters.' });
       }
-      running = true;
+      const release = await runGate.acquire(res);
+      if (!release) {
+        if (res.destroyed) return;
+        res.setHeader('retry-after', '30');
+        return json(res, 503, { error: 'Past You is busy. Please try again in a moment.' });
+      }
       try {
+        if (res.destroyed) return;
+        let allowed;
+        try { allowed = runGate.reserve(); } catch { return json(res, 503, { error: 'The demo usage limit is temporarily unavailable. Please try again later.' }); }
+        if (!allowed) return json(res, 429, { error: 'The demo has reached its daily investigation limit. Please try again after 00:00 UTC.' });
         const result = await investigate({ proposal: payload.proposal, history: selectedHistory, model: selectedModel, ...(replay ? { replay } : {}) });
         return json(res, 200, result);
       } catch (error) {
         return json(res, 502, { error: error.message || 'The investigation could not finish.' });
-      } finally { running = false; }
+      } finally { release(); }
     }
     return json(res, 404, { error: 'Not found.' });
   });
