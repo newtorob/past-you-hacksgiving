@@ -48,15 +48,16 @@ function rank(items, query) {
   }).filter(({ score }) => score > 0).sort((a, b) => b.score - a.score).map(({ item }) => item);
 }
 
-export function createHistory({ connectorBase = '', fetchImpl = fetch } = {}) {
+export function createHistory({ connectorBase = '', publicAccess = false, fetchImpl = fetch } = {}) {
   const isConnector = Boolean(connectorBase);
+  const isPublic = !isConnector && publicAccess;
   if (isConnector) {
     const parsed = new URL(connectorBase);
     if (parsed.protocol !== 'https:' || parsed.hostname !== 'api.sprites.dev' || !parsed.pathname.startsWith('/v1/gateway/github')) {
       throw new Error('The GitHub connector URL must use the Fly Sprites GitHub gateway.');
     }
   }
-  const base = connectorBase.replace(/\/+$/, '');
+  const base = isConnector ? connectorBase.replace(/\/+$/, '') : isPublic ? 'https://api.github.com' : '';
   async function get(path) {
     let response;
     try {
@@ -66,17 +67,17 @@ export function createHistory({ connectorBase = '', fetchImpl = fetch } = {}) {
         signal: AbortSignal.timeout(15000),
       });
     } catch {
-      throw new Error('Could not reach the GitHub connector. Check its connection and Sprite access.');
+      throw new Error(isConnector ? 'Could not reach the GitHub connector. Check its connection and Sprite access.' : 'Could not reach the public GitHub API. Try again.');
     }
-    if (!response.ok) throw new Error(`GitHub connector returned HTTP ${response.status}. Check its access and try again.`);
+    if (!response.ok) throw new Error(`${isConnector ? 'GitHub connector' : 'Public GitHub API'} returned HTTP ${response.status}. Check access or rate limits and try again.`);
     return response.json();
   }
   return {
-    mode: isConnector ? 'github-connector' : 'offline-fixture',
+    mode: isConnector ? 'github-connector' : isPublic ? 'github-public' : 'offline-fixture',
     repo: REPO,
     async search(query) {
       if (typeof query !== 'string' || query.trim().length < 2 || query.length > 160) throw new Error('Search needs 2 to 160 characters.');
-      if (!isConnector) return rank(FIXTURES, query).slice(0, 8);
+      if (!isConnector && !isPublic) return rank(FIXTURES, query).slice(0, 8);
       const keywords = terms(query).slice(0, 3).join(' ');
       if (!keywords) return [];
       const q = encodeURIComponent(`repo:${REPO} ${keywords}`);
@@ -86,7 +87,7 @@ export function createHistory({ connectorBase = '', fetchImpl = fetch } = {}) {
     },
     async inspect(sha) {
       if (!/^[0-9a-f]{40}$/i.test(sha || '')) throw new Error('A full commit ID is required.');
-      if (!isConnector) {
+      if (!isConnector && !isPublic) {
         const found = FIXTURES.find((item) => item.sha === sha.toLowerCase());
         if (!found) throw new Error('That commit is not in the offline sample.');
         return found;

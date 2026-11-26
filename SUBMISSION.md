@@ -11,7 +11,7 @@ Past You helps developers answer: “Did we already learn why this change is ris
 Use a real, successful live run for the recording. Do not present the offline sample as a connector or model run.
 
 1. Open with the proposed change: “Let's retry failed tool requests on any available machine.” Ask why this seemingly reasonable optimization might fail.
-2. Show that the application is running on a Sprite and that the GitHub connector and model are configured. Start the investigation and show its search, commit inspection, and test activity.
+2. Show that the application is running on a Sprite and that the Ollama connector and model are configured. Start the investigation and show its search of public GitHub history, commit inspection, and test activity.
 3. Open the linked Potluck commit. Explain the earlier failure: retries could move to a machine with incompatible tool-call markers, so tool calls were interpreted as plain text.
 4. Show the isolated replay: the historical code passes the original test; removing the matching-marker condition in memory makes that same test fail. The change is hypothetical and the replay substitutes a network test double. It is not a full Potluck test suite or a test of a submitted pull request.
 5. Show the evidence and recommendation in the handoff. End with the pitch: “Your next idea gets a second opinion from the decisions your team already made.”

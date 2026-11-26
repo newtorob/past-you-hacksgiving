@@ -2,7 +2,7 @@
 
 An agent that looks for the decision behind a proposed code change and checks a relevant regression before you repeat an old mistake.
 
-The first case uses public Potluck history: a tool-call retry once selected a machine with incompatible markers. Past You can retrieve the relevant commit through a Fly Sprites GitHub connector, use a tool-calling model to investigate it, and run the original test against both the historical code and a clearly labeled hypothetical regression.
+The first case uses public Potluck history: a tool-call retry once selected a machine with incompatible markers. Past You can retrieve the relevant commit from the public GitHub API or a Fly Sprites GitHub connector, use a tool-calling model to investigate it, and run the original test against both the historical code and a clearly labeled hypothetical regression.
 
 ## Run locally
 
@@ -34,14 +34,14 @@ This is an isolated reproduction of that test, not a full Potluck test suite or 
 
 The Hacksgiving submission must actually use at least one Sprites connector. The offline sample alone does **not** meet that requirement.
 
-1. Create a Sprite in the intended Fly organization and authorize a GitHub connector for it. Restrict the connector's access and OAuth scopes as appropriate. Past You is deliberately scoped to the public `newtorob/potluck-ai` repository in this prototype.
-2. Make the project files available on the Sprite. Copy `.env.sprite.example` to `.env.sprite` and replace the placeholders with the connector URLs shown by Fly and a tool-calling model available through a model connector. `.env.sprite` is ignored by Git. The URLs identify connectors; provider credentials remain in Fly.
+1. Create a Sprite in the intended Fly organization and set up an Ollama Cloud connector. Restrict the connector's access to the project Sprite and to the endpoints it needs. Ollama requires your own account and API key; the key stays in Fly, not in the Sprite. Past You is deliberately scoped to the public `newtorob/potluck-ai` repository in this prototype.
+2. Make the project files available on the Sprite. Copy `.env.sprite.example` to `.env.sprite` and replace the model placeholders with the Ollama connector URL shown by Fly and a tool-calling model available to your account. `.env.sprite` is ignored by Git. The URL identifies a connector; the provider credential remains in Fly. `PASTYOU_GITHUB_PUBLIC=1` reads public history directly without connecting a GitHub account.
 3. From the project directory on the Sprite, run `sh scripts/start-sprite.sh`. It listens on port 8080. For wake-on-request, install it as a Sprite service using Fly's current service instructions.
-4. Open the Sprite URL using its default organization authentication. Confirm the interface says **GitHub + model configured**, run the example, and verify the result says **GitHub connector** and includes the linked commit and both test outcomes. Configuration by itself does not prove either connection works.
+4. Open the Sprite URL using its default organization authentication. Confirm the interface says **Public GitHub + model configured**, run the example, and verify the result includes the linked commit, both test outcomes, and an agent note. Configuration by itself does not prove the Ollama connector works.
 
-`PASTYOU_GITHUB_CONNECTOR` is the GitHub gateway base URL, without a trailing API path. `PASTYOU_MODEL_URL` is the complete OpenAI-compatible `/chat/completions` endpoint of a Fly connector. `PASTYOU_MODEL` is the selected model name. The server refuses connector URLs outside `https://api.sprites.dev/v1/gateway/`; no API key is stored in this project or passed to the Sprite.
+`PASTYOU_GITHUB_PUBLIC=1` enables unauthenticated GitHub requests for the fixed public repository. Optionally, `PASTYOU_GITHUB_CONNECTOR` is the GitHub gateway base URL, without a trailing API path; if set, it takes precedence over public access. Review the GitHub OAuth scope before authorizing it: Fly may request access wider than this demo needs. `PASTYOU_MODEL_URL` is the complete OpenAI-compatible `/chat/completions` endpoint of a Fly connector. `PASTYOU_MODEL` is the selected model name. The server refuses connector URLs outside `https://api.sprites.dev/v1/gateway/`; no API key is stored in this project or passed to the Sprite.
 
-If only the GitHub connector is configured, the app uses live history with explicitly labeled simple matching. If only a model is configured, it uses labeled sample history. A live GitHub connector and model are needed for the intended agent demo; model availability and billing depend on the configured provider.
+If only public GitHub access or the GitHub connector is configured, the app uses live history with explicitly labeled simple matching. If only a model is configured, it uses labeled sample history. Live history and a working model connector are needed for the intended agent demo; model availability and billing depend on the configured provider. Public GitHub API requests are subject to unauthenticated rate limits.
 
 The Sprite URL is private by default. This prototype has a single shared investigation slot and no public-user authentication or usage quota, so keep it private while connected to accounts or a metered model.
 

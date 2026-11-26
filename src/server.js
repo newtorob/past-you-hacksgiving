@@ -25,7 +25,10 @@ async function bodyJSON(req) {
 }
 
 export function makeServer({ history, model, replay } = {}) {
-  const selectedHistory = history || createHistory({ connectorBase: process.env.PASTYOU_GITHUB_CONNECTOR || '' });
+  const selectedHistory = history || createHistory({
+    connectorBase: process.env.PASTYOU_GITHUB_CONNECTOR || '',
+    publicAccess: process.env.PASTYOU_GITHUB_PUBLIC === '1',
+  });
   const selectedModel = model === undefined ? createModel({ url: process.env.PASTYOU_MODEL_URL, name: process.env.PASTYOU_MODEL }) : model;
   let running = false;
   return createServer(async (req, res) => {

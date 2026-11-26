@@ -20,6 +20,8 @@ function node(tag, className, text) {
 function modeLabel(config) {
   if (config.sourceMode === 'github-connector' && config.modelMode === 'model') return 'GitHub + model configured';
   if (config.sourceMode === 'github-connector') return 'GitHub configured · simple matching';
+  if (config.sourceMode === 'github-public' && config.modelMode === 'model') return 'Public GitHub + model configured';
+  if (config.sourceMode === 'github-public') return 'Public GitHub · simple matching';
   if (config.modelMode === 'model') return 'Sample history · model configured';
   return 'Sample history · no model';
 }
@@ -37,6 +39,10 @@ async function loadConfig() {
       ? config.modelMode === 'model'
         ? 'Using saved public commit excerpts. Your proposed change and relevant excerpts go to the configured model.'
         : 'Using saved public commit excerpts. The test runs locally. Connect GitHub and a model for a live agent.'
+      : config.sourceMode === 'github-public'
+        ? config.modelMode === 'model'
+          ? 'Search terms go to the public GitHub API without account access. Your change and relevant commit text go to the configured model.'
+          : 'Search terms go to the public GitHub API without account access. This uses simple keyword matching; no model is connected.'
       : config.modelMode === 'model'
         ? 'Search terms go to GitHub. Your proposed change and relevant commit text go to the configured model.'
         : 'Search terms go to GitHub. This uses simple keyword matching; no model is connected.';
@@ -67,7 +73,7 @@ function testTile(label, passed, detail) {
 function markdown(report) {
   const lines = [
     '# Past You handoff', '', `**Proposed change:** ${report.proposal}`, '',
-    `**Source:** ${report.sourceMode === 'github-connector' ? 'GitHub connector' : 'Offline saved public commit excerpts'}`,
+    `**Source:** ${report.sourceMode === 'github-connector' ? 'GitHub connector' : report.sourceMode === 'github-public' ? 'Public GitHub API, without a connector' : 'Offline saved public commit excerpts'}`,
     `**Analysis:** ${report.modelMode === 'model' ? `Model (${report.model})` : 'Simple keyword matching, no model'}`, '',
     '## The note', '', report.summary, '', report.recommendation, '',
   ];
@@ -97,7 +103,7 @@ function showReport(report) {
     source.append(link);
     const parsedDate = new Date(report.evidence.date);
     const date = report.evidence.date && Number.isFinite(parsedDate.getTime()) ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(parsedDate) : 'Date unavailable';
-    source.append(node('p', 'source-meta', `${report.evidence.sha.slice(0, 7)} · ${date} · ${report.sourceMode === 'github-connector' ? 'GitHub connector' : 'saved public excerpt'}`));
+    source.append(node('p', 'source-meta', `${report.evidence.sha.slice(0, 7)} · ${date} · ${report.sourceMode === 'github-connector' ? 'GitHub connector' : report.sourceMode === 'github-public' ? 'public GitHub API' : 'saved public excerpt'}`));
     wrapper.append(source);
   }
 

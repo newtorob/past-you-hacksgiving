@@ -92,3 +92,19 @@ test('the live adapter calls only the configured Sprites GitHub gateway', async 
   assert.throws(() => createHistory({ connectorBase: 'https://attacker.example/' }), /Fly Sprites GitHub gateway/);
   assert.throws(() => createModel({ url: 'https://attacker.example/v1/chat/completions', name: 'x' }), /Fly Sprites connector gateway/);
 });
+
+test('public GitHub history uses only the fixed public API without account credentials', async () => {
+  const calls = [];
+  const fixture = { sha: TARGET_SHA, commit: { message: 'A test commit', author: { date: '2026-10-21T15:45:07Z' } } };
+  const history = createHistory({ publicAccess: true, fetchImpl: async (url, options) => {
+    calls.push({ url, options });
+    return { ok: true, json: async () => url.includes('/search/') ? { items: [fixture] } : fixture };
+  } });
+  const found = await history.search('retry tool markers');
+  await history.inspect(found[0].sha);
+  assert.equal(history.mode, 'github-public');
+  assert.ok(calls.every(({ url }) => url.startsWith('https://api.github.com/')));
+  assert.ok(calls.every(({ options }) => !Object.keys(options.headers).some((header) => header.toLowerCase() === 'authorization')));
+  assert.match(calls[0].url, /repo%3Anewtorob%2Fpotluck-ai/);
+  assert.match(calls[1].url, /\/repos\/newtorob\/potluck-ai\/commits\//);
+});
