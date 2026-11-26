@@ -108,3 +108,12 @@ test('public GitHub history uses only the fixed public API without account crede
   assert.match(calls[0].url, /repo%3Anewtorob%2Fpotluck-ai/);
   assert.match(calls[1].url, /\/repos\/newtorob\/potluck-ai\/commits\//);
 });
+
+test('an Ollama credit error produces an actionable model-connection message', async () => {
+  const model = createModel({
+    url: 'https://api.sprites.dev/v1/gateway/ollama/example/v1/chat/completions',
+    name: 'gpt-oss:20b',
+    fetchImpl: async () => ({ ok: false, status: 402 }),
+  });
+  await assert.rejects(model.chat([{ role: 'user', content: 'Check this history.' }]), /usage credits/);
+});

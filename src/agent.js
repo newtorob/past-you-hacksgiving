@@ -38,6 +38,7 @@ export function createModel({ url, name, fetchImpl = fetch } = {}) {
           signal: AbortSignal.timeout(45000),
         });
       } catch { throw new Error('The model connector could not be reached. Check its configuration and Sprite access.'); }
+      if (response.status === 402) throw new Error('The model provider needs available usage credits. Check its billing and try again.');
       if (!response.ok) throw new Error(`The model connector returned HTTP ${response.status}.`);
       const result = await response.json();
       const message = result.choices?.[0]?.message;
