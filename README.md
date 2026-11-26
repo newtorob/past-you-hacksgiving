@@ -4,6 +4,8 @@ An agent that looks for the decision behind a proposed code change and checks a 
 
 The first case uses public Potluck history: a tool-call retry once selected a machine with incompatible markers. Past You can retrieve the relevant commit from the public GitHub API or a Fly Sprites GitHub connector, use a tool-calling model to investigate it, and run the original test against both the historical code and a clearly labeled hypothetical regression.
 
+The [draft demo video](demo/past-you-demo.mp4) uses screenshots from a real Ollama-powered run, with system narration and selectable captions. It is assembled from stills, not a continuous screen recording.
+
 ## Run locally
 
 Requires Node.js 20+ and Python 3. No package installation is needed.

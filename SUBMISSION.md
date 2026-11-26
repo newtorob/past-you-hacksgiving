@@ -8,7 +8,7 @@ Past You helps developers answer: “Did we already learn why this change is ris
 
 ## Demonstration outline
 
-A local draft video is available at `demo/past-you-demo.mp4`. It uses screenshots from an actual live run, system narration, and selectable captions; it is not a continuous screen recording. Review it before sharing. The file is excluded from Git.
+A draft video is available at `demo/past-you-demo.mp4`. It uses screenshots from an actual live run, system narration, and selectable captions; it is not a continuous screen recording. Review it before sharing.
 
 1. Open with the proposed change: “Let's retry failed tool requests on any available machine.” Ask why this seemingly reasonable optimization might fail.
 2. Show that the application is running on a Sprite and that the Ollama connector and model are configured. Start the investigation and show its search of public GitHub history, commit inspection, and test activity.

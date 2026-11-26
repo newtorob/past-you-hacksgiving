@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Developers working with coding agents who want to understand an earlier decision before making a related change. The initial user and project are Rob and the public Potluck repository.
+Developers working with coding agents who want to understand an earlier decision before making a related change. The first example uses the public Potluck repository.
 
 ## Product Purpose
 
@@ -20,11 +20,11 @@ The first demonstration uses a historical Potluck commit and its original tool-c
 
 ## Capabilities and Constraints
 
-The first version is scoped to one public repository and one approved regression test. It never runs a user-supplied shell command. It distinguishes live GitHub connector data from saved sample excerpts and distinguishes model output from simple matching. Provider credentials belong in Fly connectors, not in the Sprite. Running tests against arbitrary repositories and supporting private user data are undecided.
+The first version is scoped to one public repository and one approved regression test. It never runs a user-supplied shell command. It distinguishes the public GitHub API, a live GitHub connector, and saved sample excerpts, and distinguishes model output from simple matching. Provider credentials belong in Fly connectors, not in the Sprite. Running tests against arbitrary repositories and supporting private user data are undecided.
 
 ## Evidence on Hand
 
-`fixtures/potluck/` contains the unchanged historical source and test from Potluck commit e72bb4677934c3b9a9d47f656e5550731d8f2223, along with an isolated replay harness. No live connector or model result is claimed until independently verified.
+`fixtures/potluck/` contains the unchanged historical source and test from Potluck commit e72bb4677934c3b9a9d47f656e5550731d8f2223, along with an isolated replay harness. The live Ollama connector, historical search, and both test outcomes were independently verified on a Sprite.
 
 ## Product Principles
 
