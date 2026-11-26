@@ -1,6 +1,6 @@
 # Past You: Hacksgiving draft
 
-Working draft. The application has not yet been deployed with a live Sprites connector and a model, and this is not a submission. Verify all claims and replace the placeholders after the live run.
+Working draft. The application has been verified on a Sprite with an Ollama connector and public GitHub history. The repository and Sprite are private, and this is not a submission.
 
 ## The idea
 
@@ -8,7 +8,7 @@ Past You helps developers answer: “Did we already learn why this change is ris
 
 ## Demonstration outline
 
-Use a real, successful live run for the recording. Do not present the offline sample as a connector or model run.
+A local draft video is available at `demo/past-you-demo.mp4`. It uses screenshots from an actual live run, system narration, and selectable captions; it is not a continuous screen recording. Review it before sharing. The file is excluded from Git.
 
 1. Open with the proposed change: “Let's retry failed tool requests on any available machine.” Ask why this seemingly reasonable optimization might fail.
 2. Show that the application is running on a Sprite and that the Ollama connector and model are configured. Start the investigation and show its search of public GitHub history, commit inspection, and test activity.
@@ -24,11 +24,11 @@ Past You investigates proposed changes against a project's past decisions. It ci
 
 Built Past You for @flydotio Hacksgiving: give it a proposed change and it looks for the decision your team already made, cites the commit, and replays a regression.
 
-For the demo, it catches a Potluck retry change that would break tool calls on machines with different markers. [demo link] [code link]
+For the demo, it catches a hypothetical Potluck retry regression that would break tool calls on machines with different markers. [demo link] [code link]
 
 ## Before sharing
 
-- Run the complete agent on a Sprite using an actual Sprites connector and a model. Check the visible trace and citation.
+- The complete agent has been run on a Sprite using the Ollama connector. Its trace, citation, and test outcomes were checked.
 - Publish or otherwise provide a code link and a short demo link. Keep credentials and private information out of both.
 - Review the share draft against the real implementation. Post on an allowed platform and tag @flydotio only when authorized.
 - Submit the code link, demo link, and description through the [Hacksgiving form](https://fly.io/hacksgiving/). The event page says submissions close before midnight PST on Sunday, November 29, 2026.

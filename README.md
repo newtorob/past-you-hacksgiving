@@ -49,6 +49,7 @@ The Sprite URL is private by default. This prototype has a single shared investi
 
 - The only executable test is the checked-in replay. The user and model cannot supply a command or a path to execute.
 - The model can search the selected repository, inspect only commits returned by its search, and run the one permitted test only after inspecting its matching commit. Its tool calls and iterations are bounded.
+- If the model selects the known matching commit but omits its test, the workflow runs that test and gives the observed result to the model before it writes the final handoff. The test output is always produced by the replay process.
 - Retrieved commit text is untrusted data. The model's proposed citation must match a commit it actually inspected; test results come from the replay process, not from generated text.
 - With live history, search terms derived from the proposal go to GitHub. With a model configured, the proposal and selected public commit text go to that model provider. The app displays its configured mode before an investigation.
 - Model-generated text may still be wrong. Read the linked source and observed test result before acting. No repository writes, public posts, or deployments are performed by the app.

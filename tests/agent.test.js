@@ -58,6 +58,27 @@ test('tool-using model can search, inspect, run the permitted test, and cite ins
   assert.equal(messages[3].at(-1).role, 'tool');
 });
 
+test('the known regression runs when a model selects its inspected commit but omits the test', async () => {
+  const call = (id, name, args) => ({ role: 'assistant', content: null, tool_calls: [{ id, type: 'function', function: { name, arguments: JSON.stringify(args) } }] });
+  const scripted = [
+    call('s', 'search_history', { query: 'retry tool markers' }),
+    call('i', 'inspect_commit', { sha: TARGET_SHA }),
+    { role: 'assistant', content: JSON.stringify({ source_sha: TARGET_SHA, summary: 'Prior retries needed matching markers.', recommendation: 'Keep the marker check.' }) },
+    { role: 'assistant', content: JSON.stringify({ source_sha: TARGET_SHA, summary: 'Prior retries needed matching markers.', recommendation: 'Keep the marker check; the hypothetical regression failed.' }) },
+  ];
+  let replays = 0;
+  const messages = [];
+  const model = { name: 'scripted-test-model', async chat(history) { messages.push([...history]); return scripted.shift(); } };
+  const report = await investigate({ proposal: DEFAULT_PROPOSAL, model, replay: async () => {
+    replays++;
+    return { baseline: { passed: true }, regression: { passed: false }, comparison: 'regression-reproduced' };
+  } });
+  assert.equal(replays, 1);
+  assert.equal(report.test.comparison, 'regression-reproduced');
+  assert.equal(report.activity.at(-1).type, 'test');
+  assert.match(messages.at(-1).at(-1).content, /regression-reproduced/);
+});
+
 test('a model cannot cite a commit it did not inspect', async () => {
   const model = { name: 'untrusted', async chat() { return { role: 'assistant', content: JSON.stringify({ source_sha: TARGET_SHA, summary: 'A claim', recommendation: 'An action' }) }; } };
   await assert.rejects(investigate({ proposal: DEFAULT_PROPOSAL, model }), /did not inspect/);

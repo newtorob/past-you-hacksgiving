@@ -1,0 +1,23 @@
+1
+00:00:00,000 --> 00:00:04,500
+Past You is a personal agent running on Fly Sprites with Ollama.
+
+2
+00:00:04,500 --> 00:00:07,000
+These screenshots are from a real run.
+
+3
+00:00:07,000 --> 00:00:14,300
+Before a proposed change, Past You looks for decisions the team has already made.
+
+4
+00:00:14,300 --> 00:00:20,000
+It finds the earlier fix: retries require matching tool-call markers.
+
+5
+00:00:20,000 --> 00:00:27,000
+The Sprite replays the original test. Historical code passes; a hypothetical change fails.
+
+6
+00:00:27,000 --> 00:00:34,400
+The proposed change is text and was not executed. The handoff includes the commit and evidence.
